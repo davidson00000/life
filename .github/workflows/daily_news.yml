@@ -1,0 +1,51 @@
+name: Daily News Scout
+
+on:
+  schedule:
+    # 06:30 JST is 21:30 UTC the previous day
+    - cron: '30 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  news_scout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch RSS feeds
+        run: |
+          python .agents/skills/news-scout/scripts/fetch_rss.py
+        
+      - name: Commit changes (Fail gracefully)
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add NEWS/
+          git commit -m "Auto-update NEWS for $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push || echo "No changes to push"
+
+      - name: Create Daily Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          BODY="### Daily Triage Checklist
+          - [ ] pick top 5
+          - [ ] convert 1 to idea
+          - [ ] draft 1 post
+          
+          ### Reflection
+          - What went well?
+          - What needs improvement?"
+          
+          gh issue create --title "Daily Triage: $DATE" --body "$BODY" --label "daily" || echo "Issue already exists or failed to create"
