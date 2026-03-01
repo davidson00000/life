@@ -218,18 +218,30 @@ def main():
         
         if not top_items:
             f.write("- 本日は取得されたアイテムがありませんでした。\n\n")
+        else:
+            # Markdownテーブルのヘッダーを作成
+            f.write("| スコア | タイトル | 概要 | キーワード |\n")
+            f.write("| :--- | :--- | :--- | :--- |\n")
             
-        for item in top_items:
-            f.write(f"**Score**: {item['score']}\n")
-            f.write(f"**Title**: {item['title']}\n")
-            f.write(f"**URL**: {item['url']}\n")
-            f.write(f"**Why It Matters**: {item['why_it_matters']}\n")
-            f.write("**Summary**:\n")
-            for bullet in item['summary']:
-                f.write(f"- {bullet}\n")
-            
-            tag = item['category'].replace(' ', '').replace('/', '')
-            f.write(f"**Tags**: #{tag}\n\n")
+            for item in top_items:
+                # リンク付きのタイトル
+                title_link = f"[{item['title']}]({item['url']})"
+                
+                # 要約を1つの文字列に結合（改行の代わりに<br>を使用して表崩れを防ぐ）
+                summary_text = "<br>".join([f"• {b}" for b in item['summary']])
+                
+                # なぜ重要かも追加
+                summary_text = f"**{item['why_it_matters']}**<br>{summary_text}"
+                
+                # タグ
+                tag_str = f"#{item['category'].replace(' ', '').replace('/', '')}"
+                
+                # パイプ文字などテーブルを壊す文字をエスケープ
+                title_link = title_link.replace("|", "&#124;")
+                summary_text = summary_text.replace("|", "&#124;")
+                tag_str = tag_str.replace("|", "&#124;")
+                
+                f.write(f"| {item['score']} | {title_link} | {summary_text} | {tag_str} |\n")
             
     print(f"日次ニュースを書き込みました: {out_file}")
 
