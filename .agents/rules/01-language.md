@@ -1,7 +1,7 @@
 ---
-description: Language rule for Antigravity
+description: Antigravityの言語設定ルール
 ---
-# Language
+# 言語
 
-- Output Japanese by default.
-- Ensure all explanations, comments in non-code, and task summaries are translated to Japanese unless specified otherwise.
+- デフォルトで日本語を出力すること。
+- 特に指定がない限り、説明、コード以外のコメント、タスクの要約はすべて日本語に翻訳すること。

@@ -1,12 +1,12 @@
 ---
-description: Daily triage of news and idea generation
+description: ニュースの日次トリアージとアイデア生成
 ---
 # /daily_triage
 
-1. Open today's `NEWS/yyyy-mm-dd.md` file.
-2. Select the top 5 news items most aligned with the following topics: AI research, agents, entrepreneurship, security, and hardware.
-3. For each selected item, define:
-   - Why it matters
-   - Action to take (read deeper / ignore / convert to idea)
-4. Update today's active Daily Issue with these selections.
-5. Create a new Issue for any identified task that requires >30 min to complete, using the `task.md` template.
+1. 今日の `NEWS/yyyy-mm-dd.md` ファイルを開くこと。
+2. 以下のトピック（AIリサーチ、エージェント、起業、セキュリティ、ハードウェア）のいずれかに最も関連する上位5つのニュースアイテムを選択すること。
+3. 選択した各アイテムについて、以下を定義すること：
+   - なぜそれが重要か（Why it matters）
+   - 取るべきアクション（深く読む / 無視する / アイデアに変換する）
+4. これらの選択内容で、今日のアクティブな日次Issue（Daily Issue）を更新すること。
+5. 完了に30分以上かかると判断されたタスクについては、`task.md` テンプレートを使用して新しいIssueを作成すること。

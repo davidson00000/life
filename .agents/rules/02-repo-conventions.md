@@ -1,8 +1,8 @@
 ---
-description: Repository conventions for Antigravity
+description: Antigravityのレポジトリ規約
 ---
-# Repo Conventions
+# レポジトリ規約
 
-- Always leave artifacts (issue, md, commit).
-- Never generate throwaway text.
-- Follow the predefined directory structure strictly.
+- 常に成果物（Issue、Markdown、コミット）を残すこと。
+- 使い捨てのテキストを生成しないこと。
+- 事前に定義されたディレクトリ構造を厳密に守ること。

@@ -1,8 +1,8 @@
 ---
-description: Output discipline constraints for Antigravity
+description: Antigravityの出力の規律に関する制約
 ---
-# Output Discipline
+# 出力の規律
 
-- Prefer minimal automation.
-- Do not overengineer solutions, configurations, or scripts.
-- Ensure all automated behaviors are idempotent and transparent.
+- 最小限の自動化を好むこと。
+- ソリューション、設定、スクリプトを過剰にエンジニアリング（作り込み）しないこと。
+- すべての自動化された挙動が冪等性（何度実行しても同じ結果になること）を持ち、透明であることを確認すること。

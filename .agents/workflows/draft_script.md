@@ -1,10 +1,10 @@
 ---
-description: Draft YouTube script and X post from an idea
+description: アイデアからYouTubeスクリプトとXの投稿をドラフトする
 ---
 # /draft_script
 
-1. **Input:** Take one idea (from `IDEAS/` or as specified by the user) as input.
-2. **Output Formatting:**
-   - Draft a 5–8 min YouTube script based on the idea. Ensure it has a clear hook, main content, and call to action.
-   - Draft an X (Twitter) post summarizing the core insight of the idea.
-3. **Saving:** Save the generated script and post under the `PUBLICATIONS/` directory with a descriptive filename.
+1. **入力:** 1つのアイデア（`IDEAS/` から、またはユーザーが指定したもの）を入力として受け取ること。
+2. **出力フォーマット:**
+   - そのアイデアに基づいて、5〜8分程度のYouTubeスクリプトを下書きすること。明確なフック、メインコンテンツ、コールトゥアクション（CTA）が含まれていることを確認すること。
+   - アイデアの核となる洞察を要約したX（Twitter）の投稿を下書きすること。
+3. **保存:** 生成されたスクリプトと投稿を、内容がわかるファイル名を付けて `PUBLICATIONS/` ディレクトリ配下に保存すること。

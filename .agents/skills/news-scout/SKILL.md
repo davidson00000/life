@@ -1,23 +1,23 @@
 ---
 name: News Scout
-description: Fetches daily news from configurable RSS feeds, summarizes without copyright violation, and outputs to NEWS/.
+description: 設定可能なRSSフィードから日々のニュースを取得し、著作権侵害を避けて要約し、NEWS/ に出力する。
 ---
 # News Scout
 
-This skill runs `scripts/fetch_rss.py` to aggregate daily news from configured RSS feeds.
+このスキルは `scripts/fetch_rss.py` を実行して、設定されたRSSフィードから日次ニュースを集約します。
 
-## Required Format
-The script generates a Markdown file in the `NEWS/` directory (`NEWS/yyyy-mm-dd.md`).
-Each article entry includes:
-- Title
+## 要求されるフォーマット
+スクリプトは `NEWS/` ディレクトリにMarkdownファイル（`NEWS/yyyy-mm-dd.md`）を生成します。
+各記事のエントリには以下が含まれます：
+- タイトル (Title)
 - URL
-- 2 bullet point summary (summarized or truncated to avoid copyright infringement)
-- Tags related to the category
+- 2つの箇条書きによる要約（著作権侵害を避けるため要約または切り詰められる）
+- カテゴリに関連するタグ
 
-## Feeds Configuration
-To add or remove feeds, modify the `FEEDS` dictionary inside `scripts/fetch_rss.py`. The categories are:
-- AI research
-- Security
-- Startup/product
-- Hardware
-- Developer ecosystem
+## フィードの設定
+フィードを追加または削除するには、`scripts/fetch_rss.py` 内の `FEEDS` 辞書を変更してください。カテゴリは以下の通りです：
+- AIリサーチ (AI research)
+- セキュリティ (Security)
+- スタートアップ/プロダクト (Startup/product)
+- ハードウェア (Hardware)
+- 開発者エコシステム (Developer ecosystem)
