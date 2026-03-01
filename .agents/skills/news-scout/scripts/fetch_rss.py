@@ -119,7 +119,7 @@ def parse_feed_xml(xml_data):
         entries = root.findall('.//{http://www.w3.org/2005/Atom}entry') # Atom
     
     parsed_items = []
-    for item in entries[:10]: # feeds up to 10
+    for item in entries[:30]: # feeds up to 30件取得
         # Title
         title_elem = item.find('title')
         if title_elem is None:
@@ -159,19 +159,12 @@ def parse_feed_xml(xml_data):
         else:
             bullets = [b + ("." if not b.endswith(".") else "") for b in bullets]
             
-        # 英語の要素をスコアリングするわけではないので、先にタイトルと要約を翻訳しておく
-        # ただし、スコアリングエンジン（AI_KEYWORDS, STARTUP_KEYWORDS）は英語を前提としているため、
-        # 解析自体は元の英語に対して行い、保存・表示用として翻訳版をデータにもたせる形にする。
-        
+        # 英語の要素をスコアリングするため、ここでは翻訳を遅延し生のまま返す
         parsed_items.append({
             'title_en': title,
-            'title_ja': translate_to_japanese(title),
             'url': url,
-            'summary_en': bullets,
-            # 要約を100〜200字に収めるため、翻訳して連結した上で必要ならカット
-            'summary_ja': translate_to_japanese(" ".join(bullets))
+            'summary_en': bullets
         })
-        
     return parsed_items
 
 def fetch_feed(url, category):
@@ -194,12 +187,11 @@ def fetch_feed(url, category):
                 # 英語のテキストに対してスコアリングを実行
                 score = calculate_score(p['title_en'], p['summary_en'])
                 items.append({
-                    'title': p['title_ja'], # 出力用は日本語
+                    'title_en': p['title_en'],
                     'url': p['url'],
-                    'summary': p['summary_ja'], # 出力用は日本語の単一文字列
+                    'summary_en': p['summary_en'],
                     'score': score,
-                    'category': category,
-                    'why_it_matters': generate_why_it_matters(score, category)
+                    'category': category
                 })
     except Exception as e:
         print(f"フィードの取得エラー {url}: {e}")
@@ -218,6 +210,24 @@ def deduplicate_items(items):
             unique_items[url] = item
     return list(unique_items.values())
 
+def get_historical_urls(out_dir, days=7):
+    """過去指定日数のNEWSファイルからURLを抽出し、セットとして返す"""
+    from datetime import timedelta
+    historical_urls = set()
+    
+    target_dates = [(datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(1, days + 1)]
+    
+    for date_str in target_dates:
+        file_path = os.path.join(out_dir, f"{date_str}.md")
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                # Markdown形式のリンク [タイトル](URL) からURLを抽出
+                urls = re.findall(r'\[.*?\]\((https?://[^\)]+)\)', content)
+                historical_urls.update(urls)
+                
+    return historical_urls
+
 def main():
     today = datetime.now().strftime('%Y-%m-%d')
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
@@ -225,6 +235,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, f"{today}.md")
     
+    historical_urls = get_historical_urls(out_dir, days=7)
     all_items = []
     
     for category, sources in FEEDS.items():
@@ -235,6 +246,16 @@ def main():
     # 2. Deduplication across all feeds
     all_items = deduplicate_items(all_items)
     
+    # 3. Filter out historical URLs
+    new_items = []
+    for item in all_items:
+        if item['url'] not in historical_urls and item['url'] != 'リンクなし':
+            new_items.append(item)
+        elif item['url'] == 'リンクなし':
+            new_items.append(item)
+            
+    all_items = new_items
+    
     # Check if scoring worked at all across the items
     scoring_worked = any(item['score'] > 0 for item in all_items)
     
@@ -242,19 +263,26 @@ def main():
     if scoring_worked:
         # Sort globally by score descending
         all_items.sort(key=lambda x: x['score'], reverse=True)
-        top_items = all_items[:10]
+        top_items = all_items[:30] # 30件取得
+
     else:
-        # Fallback to simple top 3 per feed behavior to maintain backward compatibility
-        # If scoring fails, we just want to grab a reasonable chunk of latest news
+        # Fallback to simple top 30 per feed behavior to maintain backward compatibility
         all_items.sort(key=lambda x: x['category']) # simple group by cat
         top_items = all_items[:30] # rough fallback
+        
+    # 5. Top 30 items obtained. Translate them here to save translation API calls.
+    for item in top_items:
+        item['title_ja'] = translate_to_japanese(item['title_en']).replace('\n', ' ').replace('\r', '')
+        summary_raw = translate_to_japanese(" ".join(item['summary_en']))
+        item['summary_ja'] = summary_raw.replace('\n', ' ').replace('\r', '')
+        item['why_it_matters'] = generate_why_it_matters(item['score'], item['category'])
         
     with open(out_file, 'w', encoding='utf-8') as f:
         f.write(f"# Daily News: {today}\n\n")
         f.write("## Top Ranked (AI / Startup Focus)\n\n")
         
         if not top_items:
-            f.write("- 本日は取得されたアイテムがありませんでした。\n\n")
+            f.write("- 本日は新しい取得アイテムがありませんでした。\n\n")
         else:
             # Markdownテーブルのヘッダーを作成
             f.write("| スコア | タイトル | 概要 | キーワード |\n")
@@ -262,10 +290,10 @@ def main():
             
             for item in top_items:
                 # リンク付きのタイトル
-                title_link = f"[{item['title']}]({item['url']})"
+                title_link = f"[{item['title_ja']}]({item['url']})"
                 
                 # 要約テキスト（翻訳済み・リストではなく単一文字列）
-                summary_text = item['summary']
+                summary_text = item['summary_ja']
                 
                 # なぜ重要かも追加
                 summary_text = f"**{item['why_it_matters']}**<br>{summary_text}"
