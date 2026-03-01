@@ -15,10 +15,12 @@
 
 ## ローカルでの実行方法
 
-手動で今日のニュースを取得する場合は、以下の `news-scout` Pythonスクリプトを実行してください:
-```bash
-python .agents/skills/news-scout/scripts/fetch_rss.py
+手動で今日のニュースを取得する場合は、Antigravityに以下のコマンドを指示してください:
 ```
+/news_fetch
+```
+（または裏側で直接 `python .agents/skills/news-scout/scripts/fetch_rss.py` を実行することも可能です。）
+
 このスクリプトはPython 3の標準ライブラリのみを使用しており、外部依存関係はありません。生成されたレポートは `NEWS/yyyy-mm-dd.md` に保存されます。
 
 ## 手動でのトリガー方法 (GitHub Actions)
