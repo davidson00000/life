@@ -35,12 +35,41 @@ STARTUP_KEYWORDS = [
     "revenue", "product-market fit", "yc", "acquisition"
 ]
 
+import json
+import urllib.parse
+import time
+
 def clean_html(raw_html):
     """HTMLタグを削除してクリーンなテキストを返す"""
     if not raw_html:
         return ""
     cleanr = re.compile('<.*?>')
     return re.sub(cleanr, '', raw_html).strip()
+
+def translate_to_japanese(text):
+    """DeepL等のAPIキーがないため、フリーの翻訳API(Google Translate URL-based)を使用して日本語に翻訳・要約する"""
+    if not text or text.strip() == "":
+        return ""
+    
+    # 連続のAPI呼び出しを防ぐための簡易スリープ
+    time.sleep(0.5)
+    
+    try:
+        url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ja&dt=t&q=" + urllib.parse.quote(text)
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            result = json.loads(response.read().decode('utf-8'))
+            translated = "".join([sentence[0] for sentence in result[0] if sentence[0]])
+            
+            # 要約を200文字以内に丸める
+            if len(translated) > 195:
+                translated = translated[:195] + "..."
+            return translated
+    except Exception as e:
+        print(f"翻訳エラー: {e}")
+        # フォールバックとして元のテキストを最大200文字にする
+        fallback = text if len(text) <= 195 else text[:195] + "..."
+        return "[Eng] " + fallback
 
 def calculate_score(title, summary_bullets):
     """簡易的なキーワードベースのスコアリングエンジン"""
@@ -122,7 +151,7 @@ def parse_feed_xml(xml_data):
         desc = extract_text(desc_elem)
         clean_desc = clean_html(desc)
         
-        # Bullet extraction
+        # Bullet extraction and translation
         sentences = [s.strip() for s in clean_desc.split('. ') if s.strip()]
         bullets = sentences[:2]
         if not bullets:
@@ -130,10 +159,17 @@ def parse_feed_xml(xml_data):
         else:
             bullets = [b + ("." if not b.endswith(".") else "") for b in bullets]
             
+        # 英語の要素をスコアリングするわけではないので、先にタイトルと要約を翻訳しておく
+        # ただし、スコアリングエンジン（AI_KEYWORDS, STARTUP_KEYWORDS）は英語を前提としているため、
+        # 解析自体は元の英語に対して行い、保存・表示用として翻訳版をデータにもたせる形にする。
+        
         parsed_items.append({
-            'title': title,
+            'title_en': title,
+            'title_ja': translate_to_japanese(title),
             'url': url,
-            'summary': bullets
+            'summary_en': bullets,
+            # 要約を100〜200字に収めるため、翻訳して連結した上で必要ならカット
+            'summary_ja': translate_to_japanese(" ".join(bullets))
         })
         
     return parsed_items
@@ -155,11 +191,12 @@ def fetch_feed(url, category):
             parsed = parse_feed_xml(xml_data)
             
             for p in parsed:
-                score = calculate_score(p['title'], p['summary'])
+                # 英語のテキストに対してスコアリングを実行
+                score = calculate_score(p['title_en'], p['summary_en'])
                 items.append({
-                    'title': p['title'],
+                    'title': p['title_ja'], # 出力用は日本語
                     'url': p['url'],
-                    'summary': p['summary'],
+                    'summary': p['summary_ja'], # 出力用は日本語の単一文字列
                     'score': score,
                     'category': category,
                     'why_it_matters': generate_why_it_matters(score, category)
@@ -227,8 +264,8 @@ def main():
                 # リンク付きのタイトル
                 title_link = f"[{item['title']}]({item['url']})"
                 
-                # 要約を1つの文字列に結合（改行の代わりに<br>を使用して表崩れを防ぐ）
-                summary_text = "<br>".join([f"• {b}" for b in item['summary']])
+                # 要約テキスト（翻訳済み・リストではなく単一文字列）
+                summary_text = item['summary']
                 
                 # なぜ重要かも追加
                 summary_text = f"**{item['why_it_matters']}**<br>{summary_text}"
