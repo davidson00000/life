@@ -14,25 +14,43 @@ FEEDS = {
         ("Reddit r/MachineLearning", "https://www.reddit.com/r/MachineLearning/.rss"),
         ("Reddit r/LocalLLaMA", "https://www.reddit.com/r/LocalLLaMA/.rss"),
         ("Google AI Blog", "https://blog.google/technology/ai/rss/"),
-        ("OpenAI blog", "https://openai.com/blog/rss/")
+        ("OpenAI blog", "https://openai.com/blog/rss/"),
+        ("Hugging Face blog", "https://huggingface.co/blog/feed.xml"),
+        ("Hugging Face papers", "https://rsshub.app/huggingface/daily-papers"),
+        ("DeepMind blog", "https://deepmind.com/blog/feed/basic"),
+        ("BAIR blog", "http://bair.berkeley.edu/blog/feed.xml"),
+        ("Zenn topic llm", "https://zenn.dev/topics/llm/feed"),
+        ("Google News (AI agent)", "https://news.google.com/rss/search?q=%22AI+agent%22+OR+%22LLM+agent%22&hl=en-US&gl=US&ceid=US:en"),
+        ("Google News (AIエージェント)", "https://news.google.com/rss/search?q=%22AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%22+OR+%22%E7%94%9F%E6%88%90AI%22+OR+%22LLM%22&hl=ja&gl=JP&ceid=JP:ja")
     ],
     "Startup/product": [
         ("Reddit r/startups", "https://www.reddit.com/r/startups/.rss"),
         ("Product Hunt", "https://www.producthunt.com/feed"),
         ("Y Combinator blog", "https://blog.ycombinator.com/feed/"),
         ("TechCrunch", "https://techcrunch.com/feed/"),
-        ("Hacker News", "https://hnrss.org/frontpage")
+        ("Hacker News", "https://hnrss.org/frontpage"),
+        ("Hacker News Official", "https://news.ycombinator.com/rss"),
+        ("Zenn trend", "https://zenn.dev/feed"),
+        ("Hatena IT hotentry", "https://b.hatena.ne.jp/hotentry/it.rss"),
+        ("Google News (Solopreneur)", "https://news.google.com/rss/search?q=solopreneur+OR+%22indie+hacker%22&hl=en-US&gl=US&ceid=US:en"),
+        ("Google News (一人起業)", "https://news.google.com/rss/search?q=%22%E4%B8%80%E4%BA%BA%E8%B5%B7%E6%A5%AD%22&hl=ja&gl=JP&ceid=JP:ja")
     ]
 }
 
 AI_KEYWORDS = [
     "agent", "benchmark", "reasoning", "inference", "scaling",
-    "alignment", "agi", "transformer", "multimodal", "evaluation"
+    "alignment", "agi", "transformer", "multimodal", "evaluation",
+    "agentic", "tool use", "function calling", "computer use",
+    "rag", "eval", "post-training", "rlhf", "dpo", "moe", "diffusion",
+    "aiエージェント", "生成ai", "自律", "評価"
 ]
 
 STARTUP_KEYWORDS = [
     "funding", "seed", "series a", "saas", "launch",
-    "revenue", "product-market fit", "yc", "acquisition"
+    "revenue", "product-market fit", "yc", "acquisition",
+    "bootstrapping", "solopreneur", "indiehacker", "monetize",
+    "pricing", "mvp", "churn", "cac", "ltv", "pmf", "distribution",
+    "一人起業", "収益化", "価格", "顧客獲得"
 ]
 
 import json
@@ -107,11 +125,12 @@ def generate_why_it_matters(score, category):
         return f"最新の動向や技術に関する注目すべき{category}関連のトピックです。"
     return "日々の情報収集として目を通しておく価値がある内容です。"
 
-def parse_feed_xml(xml_data):
+def parse_feed_xml(xml_data, url=""):
     """XMLデータを解析し、RSS/Atom双方に対応してエントリのリストを返す"""
     try:
         root = ET.fromstring(xml_data)
     except ET.ParseError:
+        print(f"URL {url} の XML パースに失敗しました")
         return []
         
     entries = root.findall('.//item') # RSS
@@ -128,19 +147,38 @@ def parse_feed_xml(xml_data):
         
         # Link
         link_elem = item.find('link')
-        url = ""
+        item_url = ""
         if link_elem is not None:
             if link_elem.text and link_elem.text.strip():
-                url = link_elem.text.strip()
+                item_url = link_elem.text.strip()
             else:
-                url = link_elem.attrib.get('href', '')
-        if not url:
+                item_url = link_elem.attrib.get('href', '')
+        if not item_url:
             link_atom = item.find('{http://www.w3.org/2005/Atom}link')
             if link_atom is not None:
-                url = link_atom.attrib.get('href', '')
-        if not url:
-            url = 'リンクなし'
+                item_url = link_atom.attrib.get('href', '')
+        if not item_url:
+            item_url = 'リンクなし'
             
+        # Date (pubDate / published / updated)
+        date_elem = item.find('pubDate')
+        if date_elem is None:
+            date_elem = item.find('{http://www.w3.org/2005/Atom}published')
+        if date_elem is None:
+            date_elem = item.find('{http://www.w3.org/2005/Atom}updated')
+            
+        raw_date = extract_text(date_elem)
+        parsed_date = ""
+        if raw_date:
+            try:
+                # Try to parse standard RSS date format, fallback to raw string if it fails
+                from email.utils import parsedate_to_datetime
+                dt = parsedate_to_datetime(raw_date)
+                parsed_date = dt.strftime('%Y-%m-%d')
+            except Exception:
+                # If it's Atom or ISO, do a rough chop to get YYYY-MM-DD
+                parsed_date = raw_date[:10]
+                
         # Description/Summary
         desc_elem = item.find('description')
         if desc_elem is None:
@@ -162,7 +200,8 @@ def parse_feed_xml(xml_data):
         # 英語の要素をスコアリングするため、ここでは翻訳を遅延し生のまま返す
         parsed_items.append({
             'title_en': title,
-            'url': url,
+            'url': item_url,
+            'date': parsed_date,
             'summary_en': bullets
         })
     return parsed_items
@@ -181,7 +220,7 @@ def fetch_feed(url, category):
         with urllib.request.urlopen(req, timeout=10) as response:
             xml_data = response.read()
             
-            parsed = parse_feed_xml(xml_data)
+            parsed = parse_feed_xml(xml_data, url)
             
             for p in parsed:
                 # 英語のテキストに対してスコアリングを実行
@@ -189,12 +228,13 @@ def fetch_feed(url, category):
                 items.append({
                     'title_en': p['title_en'],
                     'url': p['url'],
+                    'date': p.get('date', ''),
                     'summary_en': p['summary_en'],
                     'score': score,
                     'category': category
                 })
     except Exception as e:
-        print(f"フィードの取得エラー {url}: {e}")
+        print(f"カテゴリ {category} のソース (URL: {url}) 取得でエラー: {e}")
     return items
 
 def deduplicate_items(items):
@@ -284,10 +324,6 @@ def main():
         if not top_items:
             f.write("- 本日は新しい取得アイテムがありませんでした。\n\n")
         else:
-            # Markdownテーブルのヘッダーを作成
-            f.write("| スコア | タイトル | 概要 | キーワード |\n")
-            f.write("| :--- | :--- | :--- | :--- |\n")
-            
             for item in top_items:
                 # リンク付きのタイトル
                 title_link = f"[{item['title_ja']}]({item['url']})"
@@ -295,18 +331,21 @@ def main():
                 # 要約テキスト（翻訳済み・リストではなく単一文字列）
                 summary_text = item['summary_ja']
                 
-                # なぜ重要かも追加
-                summary_text = f"**{item['why_it_matters']}**<br>{summary_text}"
+                # なぜ重要か
+                why = item['why_it_matters']
                 
                 # タグ
                 tag_str = f"#{item['category'].replace(' ', '').replace('/', '')}"
                 
-                # パイプ文字などテーブルを壊す文字をエスケープ
-                title_link = title_link.replace("|", "&#124;")
-                summary_text = summary_text.replace("|", "&#124;")
-                tag_str = tag_str.replace("|", "&#124;")
+                # 日付（あれば）
+                date_str = f" ({item['date']})" if item.get('date') else ""
                 
-                f.write(f"| {item['score']} | {title_link} | {summary_text} | {tag_str} |\n")
+                # リスト形式で出力
+                f.write(f"- **(スコア: {item['score']})** {title_link}{date_str}\n")
+                f.write(f"  - **なぜ重要か**: {why}\n")
+                f.write(f"  - **概要**: {summary_text}\n")
+                f.write(f"  - **タグ**: {tag_str}\n")
+                f.write("\n")
             
     print(f"日次ニュースを書き込みました: {out_file}")
 
