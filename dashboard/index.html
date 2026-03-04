@@ -10,605 +10,375 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --border: #30363d;
-    --text: #e6edf3;
-    --text-muted: #8b949e;
-    --accent: #58a6ff;
-    --green: #3fb950;
-    --red: #f85149;
-    --purple: #bc8cff;
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --text-muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --red: #f85149; --purple: #bc8cff;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-  }
-  /* Header */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 0; z-index: 10; }
   .header-left { display: flex; align-items: center; gap: 12px; }
   .header-title { font-size: 18px; font-weight: 600; }
   .header-right { display: flex; gap: 8px; }
-  .stats { padding: 12px 24px; color: var(--text-muted); font-size: 14px; display: flex; gap: 16px; }
+  .stats { padding: 12px 24px; color: var(--text-muted); font-size: 14px; display: flex; gap: 16px; border-bottom: 1px solid var(--border); }
   .stats span { font-weight: 600; color: var(--text); }
 
-  /* Buttons */
-  .btn {
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 13px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
+  .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
   .btn:hover { background: #1f2937; }
-  .btn-primary {
-    background: var(--green);
-    color: #fff;
-    border-color: var(--green);
-  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
   .btn-primary:hover { background: #2ea043; }
-  .btn-danger {
-    background: var(--red);
-    color: #fff;
-    border-color: var(--red);
-  }
+  .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
   .btn-danger:hover { background: #da3633; }
   .btn-sm { padding: 4px 10px; font-size: 12px; }
   .btn-active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-active:hover { background: #4c9aed; }
 
-  /* Filter bar */
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 24px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
-  .search-input {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 13px;
-    width: 200px;
-  }
+  .filter-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px; }
+  .filter-group { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+  .filter-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+  .search-input { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 13px; width: 200px; outline: none; }
+  .search-input:focus { border-color: var(--accent); }
   .search-input::placeholder { color: var(--text-muted); }
 
-  /* Labels */
-  .label {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.6;
-  }
+  .label { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; line-height: 1.6; white-space: nowrap; }
 
-  /* Board view */
-  .board {
-    display: flex;
-    gap: 16px;
-    padding: 24px;
-    overflow-x: auto;
-    min-height: calc(100vh - 180px);
-  }
-  .board-column {
-    min-width: 280px;
-    max-width: 320px;
-    flex-shrink: 0;
-  }
-  .board-column-header {
-    padding: 8px 12px;
-    border-radius: 8px 8px 0 0;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .board-column-count {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 400;
-  }
-  .board-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 8px 0;
-  }
+  .board { display: flex; gap: 16px; padding: 24px; overflow-x: auto; min-height: calc(100vh - 200px); align-items: flex-start; }
+  .board-col { min-width: 280px; max-width: 320px; flex-shrink: 0; }
+  .board-col-head { padding: 10px 12px; border-radius: 8px 8px 0 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .board-col-count { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+  .board-cards { display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
 
-  /* Cards */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .card:hover { border-color: var(--accent); }
-  .card-closed { opacity: 0.5; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .card-closed { opacity: 0.45; }
   .card-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-muted);
-  }
+  .card-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
   .card-labels { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
 
-  /* List view */
   .list-view { padding: 0 24px 24px; }
-  .list-row {
-    display: grid;
-    grid-template-columns: 60px 1fr auto auto 120px;
-    gap: 12px;
-    align-items: center;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.1s;
-  }
-  .list-row:hover { background: rgba(88,166,255,0.05); }
-  .list-number { color: var(--text-muted); font-size: 13px; }
-  .list-title { font-weight: 500; }
-  .list-state-open { color: var(--green); }
-  .list-state-closed { color: var(--purple); }
+  .list-row { display: grid; grid-template-columns: 56px 1fr auto auto 110px; gap: 12px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 14px; transition: background 0.1s; }
+  .list-row:hover { background: rgba(88,166,255,0.06); }
+  .list-num { color: var(--text-muted); font-size: 13px; }
+  .list-title { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .list-labels { display: flex; gap: 4px; }
+  .list-state-open { color: var(--green); font-size: 13px; }
+  .list-state-closed { color: var(--purple); font-size: 13px; }
   .list-date { color: var(--text-muted); font-size: 13px; text-align: right; }
 
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-  }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    width: 90%;
-    max-width: 640px;
-    max-height: 80vh;
-    overflow-y: auto;
-    padding: 24px;
-  }
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-  }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 92%; max-width: 640px; max-height: 85vh; overflow-y: auto; padding: 24px; }
+  .modal-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 12px; }
   .modal-title { font-size: 20px; font-weight: 600; flex: 1; }
-  .modal-close {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0 4px;
-  }
-  .modal-close:hover { color: var(--text); }
+  .modal-x { background: none; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; padding: 0 4px; line-height: 1; }
+  .modal-x:hover { color: var(--text); }
+  .modal-labels { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; }
   .modal-body { color: var(--text); font-size: 14px; }
   .modal-body h1, .modal-body h2, .modal-body h3 { margin: 16px 0 8px; }
   .modal-body p { margin: 8px 0; }
   .modal-body ul, .modal-body ol { margin: 8px 0; padding-left: 24px; }
+  .modal-body li { margin: 4px 0; }
   .modal-body code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
   .modal-body pre { background: var(--bg); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+  .modal-body pre code { padding: 0; }
   .modal-body a { color: var(--accent); }
-  .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-  .modal-labels { display: flex; gap: 4px; flex-wrap: wrap; margin: 12px 0; }
+  .modal-body input[type="checkbox"] { margin-right: 6px; }
+  .modal-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); gap: 8px; }
 
-  /* Form */
   .form-group { margin-bottom: 14px; }
-  .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-  .form-input, .form-textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    font-family: inherit;
-  }
+  .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
+  .form-input, .form-textarea { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; outline: none; }
+  .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
   .form-textarea { min-height: 120px; resize: vertical; }
   .label-picker { display: flex; gap: 6px; flex-wrap: wrap; }
-  .label-option {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 0.15s;
-  }
-  .label-option-selected { border-color: #fff; }
+  .label-chip { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; user-select: none; }
+  .label-chip-on { border-color: #fff; }
 
-  /* Login */
-  .login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 24px;
-  }
-  .login-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-  }
+  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+  .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; width: 100%; max-width: 420px; text-align: center; }
   .login-box h1 { font-size: 24px; margin-bottom: 8px; }
   .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
   .login-box .form-input { margin-bottom: 12px; text-align: center; }
-  .login-warning {
-    background: rgba(248,81,73,0.1);
-    border: 1px solid rgba(248,81,73,0.3);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 12px;
-    color: var(--red);
-    margin-bottom: 16px;
-  }
+  .login-note { background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.25); border-radius: 6px; padding: 10px 12px; font-size: 12px; color: var(--accent); margin-bottom: 16px; text-align: left; line-height: 1.6; }
 
-  /* Loading */
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    color: var(--text-muted);
-  }
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-right: 8px;
-  }
+  .empty { display: flex; align-items: center; justify-content: center; min-height: 200px; color: var(--text-muted); flex-direction: column; gap: 8px; }
+  .spinner { width: 24px; height: 24px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--green); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; z-index: 60; animation: fadeIn 0.2s; }
+  .toast-error { background: var(--red); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 <div id="root"></div>
+<noscript><p style="color:#e6edf3;text-align:center;margin-top:40vh">JavaScriptを有効にしてください</p></noscript>
+
 <script type="text/babel">
-const { useState, useEffect, useCallback, useMemo } = React;
+const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
+/* ── Storage wrapper (localStorage fallback for file://) ── */
+const storage = (() => {
+  const mem = {};
+  try { localStorage.setItem("__test", "1"); localStorage.removeItem("__test"); return localStorage; }
+  catch { return { getItem: k => mem[k] || null, setItem: (k,v) => { mem[k] = v; }, removeItem: k => { delete mem[k]; } }; }
+})();
+
+/* ── Constants ── */
 const REPO = "davidson00000/life";
-const API = "https://api.github.com";
-
-const LABEL_COLORS = {
-  ACS: "#0075ca",
-  work: "#0e8a16",
-  life: "#e4e669",
-  learn: "#7057ff",
-  idea: "#e99695",
-  someday: "#cccccc",
-  urgent: "#d93f0b",
-  waiting: "#bfd4f2",
+const API  = "https://api.github.com";
+const LABELS = {
+  ACS:     "#0075ca", work:    "#0e8a16", life:    "#e4e669", learn:   "#7057ff",
+  idea:    "#e99695", someday: "#cccccc", urgent:  "#d93f0b", waiting: "#bfd4f2",
 };
-const LABEL_NAMES = Object.keys(LABEL_COLORS);
+const LABEL_NAMES = Object.keys(LABELS);
 
-function contrastColor(hex) {
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+/* ── Helpers ── */
+const contrast = hex => {
+  const [r,g,b] = [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
   return (r*299+g*587+b*114)/1000 > 128 ? "#000" : "#fff";
-}
-
-function timeAgo(date) {
-  const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+};
+const ago = iso => {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 60) return `${s}秒前`;
   const m = Math.floor(s/60); if (m < 60) return `${m}分前`;
   const h = Math.floor(m/60); if (h < 24) return `${h}時間前`;
   const d = Math.floor(h/24); if (d < 30) return `${d}日前`;
-  const mo = Math.floor(d/30); return `${mo}ヶ月前`;
+  return `${Math.floor(d/30)}ヶ月前`;
+};
+const fmtDate = iso => new Date(iso).toLocaleDateString("ja-JP");
+
+/* ── Label badge ── */
+function Badge({ name }) {
+  const bg = LABELS[name] || "#555";
+  return <span className="label" style={{ background: bg, color: contrast(bg) }}>{name}</span>;
 }
 
-function Label({ name }) {
-  const bg = LABEL_COLORS[name] || "#666";
-  return <span className="label" style={{ background: bg, color: contrastColor(bg) }}>{name}</span>;
-}
+/* ── GitHub API ── */
+const headers = token => ({ Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" });
 
-// === API ===
-async function fetchIssues(token, state) {
-  const issues = [];
-  let page = 1;
-  while (true) {
-    const res = await fetch(`${API}/repos/${REPO}/issues?state=${state}&per_page=100&page=${page}`, {
-      headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" },
-    });
-    if (!res.ok) throw new Error(`API Error: ${res.status}`);
-    const data = await res.json();
-    if (data.length === 0) break;
-    issues.push(...data.filter(i => !i.pull_request));
-    if (data.length < 100) break;
-    page++;
+async function apiFetchIssues(token, state) {
+  const out = [];
+  for (let p = 1; ; p++) {
+    const r = await fetch(`${API}/repos/${REPO}/issues?state=${state}&per_page=100&page=${p}`, { headers: headers(token) });
+    if (!r.ok) throw new Error(`API ${r.status}: ${r.statusText}`);
+    const d = await r.json();
+    out.push(...d.filter(i => !i.pull_request));
+    if (d.length < 100) break;
   }
-  return issues;
+  return out;
 }
-
-async function createIssue(token, title, body, labels) {
-  const res = await fetch(`${API}/repos/${REPO}/issues`, {
-    method: "POST",
-    headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json", "Content-Type": "application/json" },
+async function apiCreateIssue(token, title, body, labels) {
+  const r = await fetch(`${API}/repos/${REPO}/issues`, {
+    method: "POST", headers: { ...headers(token), "Content-Type": "application/json" },
     body: JSON.stringify({ title, body, labels }),
   });
-  if (!res.ok) throw new Error(`Create Error: ${res.status}`);
-  return res.json();
+  if (!r.ok) throw new Error(`Create failed: ${r.status}`);
+  return r.json();
 }
-
-async function closeIssue(token, number) {
-  const res = await fetch(`${API}/repos/${REPO}/issues/${number}`, {
-    method: "PATCH",
-    headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json", "Content-Type": "application/json" },
-    body: JSON.stringify({ state: "closed" }),
+async function apiPatchIssue(token, number, patch) {
+  const r = await fetch(`${API}/repos/${REPO}/issues/${number}`, {
+    method: "PATCH", headers: { ...headers(token), "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
   });
-  if (!res.ok) throw new Error(`Close Error: ${res.status}`);
-  return res.json();
+  if (!r.ok) throw new Error(`Patch failed: ${r.status}`);
+  return r.json();
 }
 
-async function reopenIssue(token, number) {
-  const res = await fetch(`${API}/repos/${REPO}/issues/${number}`, {
-    method: "PATCH",
-    headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json", "Content-Type": "application/json" },
-    body: JSON.stringify({ state: "open" }),
-  });
-  if (!res.ok) throw new Error(`Reopen Error: ${res.status}`);
-  return res.json();
+/* ── Demo data ── */
+const DEMO = [
+  { number:1, title:"NISAの口座開設手続きをする",         state:"open",   labels:[{name:"life"}],                    body:"## やること\nSBI証券でNISA口座を開設する\n\n## 期限\n2026-03-15",                  created_at:new Date(Date.now()-86400e3*2).toISOString(), comments:1, html_url:"" },
+  { number:2, title:"Claude Code のメモリ機能を調査する",  state:"open",   labels:[{name:"ACS"}],                     body:"auto memory の挙動を検証する",                                                  created_at:new Date(Date.now()-86400e3*5).toISOString(), comments:0, html_url:"" },
+  { number:3, title:"確定申告の書類を準備する",            state:"open",   labels:[{name:"life"},{name:"urgent"}],     body:"- [ ] マイナンバーカード\n- [ ] 源泉徴収票\n- [ ] 医療費の領収書",                 created_at:new Date(Date.now()-86400e3*7).toISOString(), comments:3, html_url:"" },
+  { number:4, title:"AIエージェント×SaaS の事業案を検討",  state:"open",   labels:[{name:"idea"}],                    body:"ファクトチェックサービスの可能性を調べる",                                        created_at:new Date(Date.now()-86400e3*1).toISOString(), comments:0, html_url:"" },
+  { number:5, title:"Rustの基礎を学習する",                state:"open",   labels:[{name:"learn"}],                   body:"The Rust Programming Language を読む",                                           created_at:new Date(Date.now()-86400e3*10).toISOString(), comments:2, html_url:"" },
+  { number:6, title:"ポートフォリオサイトを更新する",      state:"open",   labels:[{name:"work"}],                    body:"最新のプロジェクトを追加する",                                                    created_at:new Date(Date.now()-86400e3*3).toISOString(), comments:0, html_url:"" },
+  { number:7, title:"クライアントAへの提案書の返信を待つ", state:"open",   labels:[{name:"work"},{name:"waiting"}],    body:"3/1に送付済み。3/7までに返答なければフォロー",                                    created_at:new Date(Date.now()-86400e3*4).toISOString(), comments:1, html_url:"" },
+  { number:8, title:"いつかホームサーバーを立てる",        state:"open",   labels:[{name:"someday"}],                 body:"Raspberry Pi 5 + Tailscale の構成を検討",                                        created_at:new Date(Date.now()-86400e3*15).toISOString(), comments:0, html_url:"" },
+  { number:9, title:"GraphRAGの技術調査をまとめる",        state:"closed", labels:[{name:"ACS"}],                     body:"LangChain + NetworkX の検証結果をまとめた",                                      created_at:new Date(Date.now()-86400e3*14).toISOString(), comments:4, html_url:"" },
+  { number:10,title:"健康診断の予約をする",                state:"closed", labels:[{name:"life"}],                    body:"4/15に予約完了",                                                                 created_at:new Date(Date.now()-86400e3*20).toISOString(), comments:0, html_url:"" },
+];
+
+/* ── Toast hook ── */
+function useToast() {
+  const [msg, setMsg] = useState(null);
+  const show = useCallback((text, isError) => { setMsg({ text, isError }); setTimeout(() => setMsg(null), 3000); }, []);
+  const el = msg ? <div className={`toast ${msg.isError ? "toast-error" : ""}`}>{msg.text}</div> : null;
+  return [show, el];
 }
 
-// === Demo Data ===
-function demoData() {
-  return [
-    { number: 1, title: "NISAの口座開設手続きをする", state: "open", labels: [{ name: "life" }], body: "## やること\nSBI証券でNISA口座を開設する\n\n## 期限\n2026-03-15", created_at: new Date(Date.now()-86400000*2).toISOString(), comments: 1 },
-    { number: 2, title: "Claude Code のメモリ機能を調査する", state: "open", labels: [{ name: "ACS" }], body: "auto memory の挙動を検証する", created_at: new Date(Date.now()-86400000*5).toISOString(), comments: 0 },
-    { number: 3, title: "確定申告の書類を準備する", state: "open", labels: [{ name: "life" }, { name: "urgent" }], body: "マイナンバーカード、源泉徴収票", created_at: new Date(Date.now()-86400000*7).toISOString(), comments: 3 },
-    { number: 4, title: "AIエージェント×SaaS の事業案を検討する", state: "open", labels: [{ name: "idea" }], body: "ファクトチェックサービスの可能性", created_at: new Date(Date.now()-86400000).toISOString(), comments: 0 },
-    { number: 5, title: "Rustの基礎を学習する", state: "open", labels: [{ name: "learn" }], body: "The Rust Programming Language を読む", created_at: new Date(Date.now()-86400000*10).toISOString(), comments: 2 },
-    { number: 6, title: "ポートフォリオサイトを更新する", state: "open", labels: [{ name: "work" }], body: "", created_at: new Date(Date.now()-86400000*3).toISOString(), comments: 0 },
-    { number: 7, title: "GraphRAGの技術調査をまとめる", state: "closed", labels: [{ name: "ACS" }], body: "LangChain + NetworkX の検証結果", created_at: new Date(Date.now()-86400000*14).toISOString(), comments: 4 },
-    { number: 8, title: "健康診断の予約をする", state: "closed", labels: [{ name: "life" }], body: "", created_at: new Date(Date.now()-86400000*20).toISOString(), comments: 0 },
-  ];
-}
-
-// === Components ===
-function LoginScreen({ onLogin, onDemo }) {
-  const [token, setToken] = useState("");
+/* ── Login screen ── */
+function Login({ onLogin, onDemo }) {
+  const [tok, setTok] = useState("");
   return (
-    <div className="login-container">
+    <div className="login-wrap">
       <div className="login-box">
         <h1>Life Dashboard</h1>
         <p>davidson00000/life の Issues を管理</p>
-        <div className="login-warning">
-          トークンはブラウザの localStorage に保存されます。共有PCでの使用にご注意ください。
+        <div className="login-note">
+          ローカルファイルとして動作しています。<br/>
+          トークンはこのブラウザの localStorage に保存されます。<br/>
+          repo スコープ付きの Personal Access Token を入力してください。
         </div>
-        <input
-          className="form-input"
-          type="password"
-          placeholder="GitHub Personal Access Token"
-          value={token}
-          onChange={e => setToken(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && token && onLogin(token)}
-        />
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => token && onLogin(token)}>ログイン</button>
-          <button className="btn" style={{ flex: 1 }} onClick={onDemo}>デモデータで見る</button>
+        <input className="form-input" type="password" placeholder="ghp_xxxxxxxxxxxx"
+          value={tok} onChange={e => setTok(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && tok && onLogin(tok)} />
+        <div style={{ display:"flex", gap:8 }}>
+          <button className="btn btn-primary" style={{ flex:1 }} onClick={() => tok && onLogin(tok)} disabled={!tok}>ログイン</button>
+          <button className="btn" style={{ flex:1 }} onClick={onDemo}>デモで見る</button>
         </div>
       </div>
     </div>
   );
 }
 
-function IssueCard({ issue, onClick }) {
+/* ── Issue card (board) ── */
+function Card({ issue, onClick }) {
   return (
-    <div className={`card ${issue.state === "closed" ? "card-closed" : ""}`} onClick={() => onClick(issue)}>
-      <div className="card-labels">
-        {issue.labels.map(l => <Label key={l.name} name={l.name} />)}
-      </div>
+    <div className={`card${issue.state === "closed" ? " card-closed" : ""}`} onClick={() => onClick(issue)}>
+      <div className="card-labels">{issue.labels.map(l => <Badge key={l.name} name={l.name} />)}</div>
       <div className="card-title">{issue.title}</div>
       <div className="card-meta">
         <span>#{issue.number}</span>
-        <span>{timeAgo(issue.created_at)}</span>
-        {issue.comments > 0 && <span>💬 {issue.comments}</span>}
+        <span>{ago(issue.created_at)}</span>
+        {issue.comments > 0 && <span>💬{issue.comments}</span>}
       </div>
     </div>
   );
 }
 
-function BoardView({ issues, onClickIssue }) {
-  const columns = useMemo(() => {
-    const cols = {};
-    LABEL_NAMES.forEach(l => { cols[l] = []; });
-    cols["other"] = [];
-    issues.forEach(issue => {
-      const matched = issue.labels.filter(l => LABEL_NAMES.includes(l.name));
-      if (matched.length === 0) {
-        cols["other"].push(issue);
-      } else {
-        matched.forEach(l => { cols[l.name].push(issue); });
-      }
+/* ── Board view ── */
+function Board({ issues, onSelect }) {
+  const cols = useMemo(() => {
+    const c = {}; LABEL_NAMES.forEach(n => c[n] = []); c._other = [];
+    issues.forEach(iss => {
+      const m = iss.labels.filter(l => LABEL_NAMES.includes(l.name));
+      if (!m.length) c._other.push(iss); else m.forEach(l => c[l.name].push(iss));
     });
-    return cols;
+    return c;
   }, [issues]);
+
+  const renderCol = (name, color) => {
+    if (!cols[name] || !cols[name].length) return null;
+    return (
+      <div className="board-col" key={name}>
+        <div className="board-col-head" style={{ background: color + "20" }}>
+          <span className="label" style={{ background: color, color: contrast(color) }}>{name}</span>
+          <span className="board-col-count">{cols[name].length}</span>
+        </div>
+        <div className="board-cards">{cols[name].map(i => <Card key={i.number} issue={i} onClick={onSelect} />)}</div>
+      </div>
+    );
+  };
 
   return (
     <div className="board">
-      {LABEL_NAMES.map(name => (
-        columns[name].length > 0 && (
-          <div className="board-column" key={name}>
-            <div className="board-column-header" style={{ background: LABEL_COLORS[name] + "22" }}>
-              <Label name={name} />
-              <span className="board-column-count">{columns[name].length}</span>
-            </div>
-            <div className="board-cards">
-              {columns[name].map(i => <IssueCard key={i.number} issue={i} onClick={onClickIssue} />)}
-            </div>
-          </div>
-        )
-      ))}
-      {columns["other"].length > 0 && (
-        <div className="board-column">
-          <div className="board-column-header" style={{ background: "#66666622" }}>
-            <span className="label" style={{ background: "#666", color: "#fff" }}>other</span>
-            <span className="board-column-count">{columns["other"].length}</span>
-          </div>
-          <div className="board-cards">
-            {columns["other"].map(i => <IssueCard key={i.number} issue={i} onClick={onClickIssue} />)}
-          </div>
-        </div>
-      )}
+      {LABEL_NAMES.map(n => renderCol(n, LABELS[n]))}
+      {renderCol("_other", "#555")}
     </div>
   );
 }
 
-function ListView({ issues, onClickIssue }) {
+/* ── List view ── */
+function List({ issues, onSelect }) {
   return (
     <div className="list-view">
-      {issues.map(issue => (
-        <div className="list-row" key={issue.number} onClick={() => onClickIssue(issue)}>
-          <span className="list-number">#{issue.number}</span>
-          <span className="list-title">{issue.title}</span>
-          <span>
-            {issue.labels.map(l => <Label key={l.name} name={l.name} />)}
+      {issues.map(iss => (
+        <div className="list-row" key={iss.number} onClick={() => onSelect(iss)}>
+          <span className="list-num">#{iss.number}</span>
+          <span className="list-title">{iss.title}</span>
+          <span className="list-labels">{iss.labels.map(l => <Badge key={l.name} name={l.name} />)}</span>
+          <span className={iss.state === "open" ? "list-state-open" : "list-state-closed"}>
+            {iss.state === "open" ? "● Open" : "● Closed"}
           </span>
-          <span className={issue.state === "open" ? "list-state-open" : "list-state-closed"}>
-            {issue.state === "open" ? "● Open" : "● Closed"}
-          </span>
-          <span className="list-date">{new Date(issue.created_at).toLocaleDateString("ja-JP")}</span>
+          <span className="list-date">{fmtDate(iss.created_at)}</span>
         </div>
       ))}
     </div>
   );
 }
 
-function DetailModal({ issue, onClose, onCloseIssue, onReopenIssue, isDemo }) {
-  const bodyHtml = useMemo(() => {
-    if (!issue.body) return "<p style='color:var(--text-muted)'>（本文なし）</p>";
+/* ── Detail modal ── */
+function Detail({ issue, onClose, onAction, isDemo }) {
+  const html = useMemo(() => {
+    if (!issue.body) return '<p style="color:var(--text-muted)">（本文なし）</p>';
     return marked.parse(issue.body);
   }, [issue.body]);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+        <div className="modal-head">
           <div className="modal-title">#{issue.number} {issue.title}</div>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-x" onClick={onClose}>×</button>
         </div>
-        <div className="modal-labels">
-          {issue.labels.map(l => <Label key={l.name} name={l.name} />)}
-        </div>
-        <div className="modal-body" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
-        <div className="modal-footer">
+        <div className="modal-labels">{issue.labels.map(l => <Badge key={l.name} name={l.name} />)}</div>
+        <div className="modal-body" dangerouslySetInnerHTML={{ __html: html }} />
+        <div className="modal-foot">
           <a href={issue.html_url || `https://github.com/${REPO}/issues/${issue.number}`}
-             target="_blank" rel="noopener noreferrer" className="btn btn-sm">
-            GitHub で開く ↗
-          </a>
-          <div style={{ display: "flex", gap: 8 }}>
-            {!isDemo && issue.state === "open" && (
-              <button className="btn btn-sm btn-danger" onClick={() => onCloseIssue(issue.number)}>
-                Close Issue
-              </button>
-            )}
-            {!isDemo && issue.state === "closed" && (
-              <button className="btn btn-sm btn-primary" onClick={() => onReopenIssue(issue.number)}>
-                Reopen Issue
-              </button>
-            )}
-          </div>
+             target="_blank" rel="noopener noreferrer" className="btn btn-sm">GitHub で開く ↗</a>
+          {!isDemo && (
+            <div style={{ display:"flex", gap:8 }}>
+              {issue.state === "open" && <button className="btn btn-sm btn-danger" onClick={() => onAction(issue.number, "close")}>Close</button>}
+              {issue.state === "closed" && <button className="btn btn-sm btn-primary" onClick={() => onAction(issue.number, "reopen")}>Reopen</button>}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function NewIssueModal({ onClose, onCreate }) {
+/* ── New issue modal ── */
+function NewIssue({ onClose, onCreate }) {
   const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [body, setBody]   = useState("");
   const [labels, setLabels] = useState([]);
-  const [creating, setCreating] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const ref = useRef(null);
 
-  const toggleLabel = (name) => {
-    setLabels(prev => prev.includes(name) ? prev.filter(l => l !== name) : [...prev, name]);
-  };
+  useEffect(() => { ref.current?.focus(); }, []);
 
-  const handleCreate = async () => {
-    if (!title.trim()) return;
-    setCreating(true);
+  const toggle = n => setLabels(p => p.includes(n) ? p.filter(x => x !== n) : [...p, n]);
+  const submit = async () => {
+    if (!title.trim() || busy) return;
+    setBusy(true);
     await onCreate(title.trim(), body.trim(), labels);
-    setCreating(false);
+    setBusy(false);
     onClose();
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+        <div className="modal-head">
           <div className="modal-title">New Issue</div>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-x" onClick={onClose}>×</button>
         </div>
         <div className="form-group">
           <label className="form-label">タイトル</label>
-          <input className="form-input" placeholder="〇〇を△△する" value={title}
-                 onChange={e => setTitle(e.target.value)}
-                 onKeyDown={e => e.key === "Enter" && handleCreate()} />
+          <input ref={ref} className="form-input" placeholder="〇〇を△△する" value={title}
+            onChange={e => setTitle(e.target.value)} onKeyDown={e => e.key === "Enter" && !e.shiftKey && submit()} />
         </div>
         <div className="form-group">
           <label className="form-label">本文（Markdown）</label>
-          <textarea className="form-textarea" placeholder="詳細・背景・チェックリストなど..."
-                    value={body} onChange={e => setBody(e.target.value)} />
+          <textarea className="form-textarea" placeholder="詳細・背景・チェックリストなど..." value={body} onChange={e => setBody(e.target.value)} />
         </div>
         <div className="form-group">
           <label className="form-label">ラベル</label>
           <div className="label-picker">
-            {LABEL_NAMES.map(name => (
-              <span key={name}
-                    className={`label-option ${labels.includes(name) ? "label-option-selected" : ""}`}
-                    style={{ background: LABEL_COLORS[name], color: contrastColor(LABEL_COLORS[name]) }}
-                    onClick={() => toggleLabel(name)}>
-                {name}
-              </span>
+            {LABEL_NAMES.map(n => (
+              <span key={n} className={`label-chip${labels.includes(n) ? " label-chip-on" : ""}`}
+                style={{ background: LABELS[n], color: contrast(LABELS[n]) }}
+                onClick={() => toggle(n)}>{n}</span>
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
+        <div style={{ display:"flex", justifyContent:"flex-end", gap:8, marginTop:16 }}>
           <button className="btn" onClick={onClose}>キャンセル</button>
-          <button className="btn btn-primary" onClick={handleCreate} disabled={creating || !title.trim()}>
-            {creating ? "作成中..." : "作成する"}
+          <button className="btn btn-primary" onClick={submit} disabled={busy || !title.trim()}>
+            {busy ? "作成中..." : "作成する"}
           </button>
         </div>
       </div>
@@ -616,166 +386,132 @@ function NewIssueModal({ onClose, onCreate }) {
   );
 }
 
+/* ── App ── */
 function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("gh_token") || "");
-  const [loggedIn, setLoggedIn] = useState(() => !!localStorage.getItem("gh_token"));
-  const [isDemo, setIsDemo] = useState(false);
+  const [token, setToken]   = useState(() => storage.getItem("life_gh_token") || "");
+  const [authed, setAuthed] = useState(() => !!storage.getItem("life_gh_token"));
+  const [demo, setDemo]     = useState(false);
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const [stateFilter, setStateFilter] = useState("open");
-  const [labelFilter, setLabelFilter] = useState("ALL");
-  const [viewMode, setViewMode] = useState("board");
+  const [stFilter, setStFilter] = useState("open");
+  const [lbFilter, setLbFilter] = useState("ALL");
+  const [view, setView] = useState("board");
   const [search, setSearch] = useState("");
 
-  const [selectedIssue, setSelectedIssue] = useState(null);
-  const [showNewIssue, setShowNewIssue] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [showNew, setShowNew]   = useState(false);
+  const [toast, toastEl]        = useToast();
 
-  const loadIssues = useCallback(async () => {
-    if (isDemo) { setIssues(demoData()); return; }
+  /* load */
+  const load = useCallback(async () => {
+    if (demo) { setIssues(DEMO); return; }
     if (!token) return;
     setLoading(true);
-    setError("");
     try {
-      const [open, closed] = await Promise.all([fetchIssues(token, "open"), fetchIssues(token, "closed")]);
-      setIssues([...open, ...closed]);
-    } catch (e) {
-      setError(e.message);
-    }
+      const [op, cl] = await Promise.all([apiFetchIssues(token, "open"), apiFetchIssues(token, "closed")]);
+      setIssues([...op, ...cl]);
+      toast(`${op.length + cl.length} issues を取得しました`);
+    } catch (e) { toast(e.message, true); }
     setLoading(false);
-  }, [token, isDemo]);
+  }, [token, demo]);
 
-  useEffect(() => { if (loggedIn || isDemo) loadIssues(); }, [loggedIn, isDemo, loadIssues]);
+  useEffect(() => { if (authed || demo) load(); }, [authed, demo, load]);
 
-  const handleLogin = (t) => {
-    localStorage.setItem("gh_token", t);
-    setToken(t);
-    setLoggedIn(true);
-    setIsDemo(false);
-  };
-  const handleDemo = () => { setIsDemo(true); setLoggedIn(false); };
-  const handleLogout = () => {
-    localStorage.removeItem("gh_token");
-    setToken("");
-    setLoggedIn(false);
-    setIsDemo(false);
-    setIssues([]);
-  };
+  /* auth */
+  const login = t => { storage.setItem("life_gh_token", t); setToken(t); setAuthed(true); setDemo(false); };
+  const enterDemo = () => { setDemo(true); setAuthed(false); };
+  const logout = () => { storage.removeItem("life_gh_token"); setToken(""); setAuthed(false); setDemo(false); setIssues([]); };
 
-  const handleCloseIssue = async (number) => {
+  /* actions */
+  const patchState = async (num, action) => {
+    const newState = action === "close" ? "closed" : "open";
     try {
-      await closeIssue(token, number);
-      setIssues(prev => prev.map(i => i.number === number ? { ...i, state: "closed" } : i));
-      setSelectedIssue(prev => prev ? { ...prev, state: "closed" } : null);
-    } catch (e) { alert("Error: " + e.message); }
+      await apiPatchIssue(token, num, { state: newState });
+      setIssues(p => p.map(i => i.number === num ? { ...i, state: newState } : i));
+      setSelected(p => p && p.number === num ? { ...p, state: newState } : p);
+      toast(action === "close" ? `#${num} をクローズしました` : `#${num} をリオープンしました`);
+    } catch (e) { toast(e.message, true); }
   };
 
-  const handleReopenIssue = async (number) => {
+  const create = async (title, body, labels) => {
     try {
-      await reopenIssue(token, number);
-      setIssues(prev => prev.map(i => i.number === number ? { ...i, state: "open" } : i));
-      setSelectedIssue(prev => prev ? { ...prev, state: "open" } : null);
-    } catch (e) { alert("Error: " + e.message); }
+      const iss = await apiCreateIssue(token, title, body, labels);
+      setIssues(p => [iss, ...p]);
+      toast(`#${iss.number} を作成しました`);
+    } catch (e) { toast(e.message, true); }
   };
 
-  const handleCreateIssue = async (title, body, labels) => {
-    try {
-      const created = await createIssue(token, title, body, labels);
-      setIssues(prev => [created, ...prev]);
-    } catch (e) { alert("Error: " + e.message); }
-  };
-
+  /* filter */
   const filtered = useMemo(() => {
-    let result = issues;
-    if (stateFilter !== "all") result = result.filter(i => i.state === stateFilter);
-    if (labelFilter !== "ALL") result = result.filter(i => i.labels.some(l => l.name === labelFilter));
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(i => i.title.toLowerCase().includes(q) || (i.body || "").toLowerCase().includes(q));
-    }
-    return result;
-  }, [issues, stateFilter, labelFilter, search]);
+    let r = issues;
+    if (stFilter !== "all") r = r.filter(i => i.state === stFilter);
+    if (lbFilter !== "ALL") r = r.filter(i => i.labels.some(l => l.name === lbFilter));
+    if (search) { const q = search.toLowerCase(); r = r.filter(i => i.title.toLowerCase().includes(q) || (i.body||"").toLowerCase().includes(q)); }
+    return r;
+  }, [issues, stFilter, lbFilter, search]);
 
-  const openCount = issues.filter(i => i.state === "open").length;
-  const closedCount = issues.filter(i => i.state === "closed").length;
+  const openN  = issues.filter(i => i.state === "open").length;
+  const closeN = issues.filter(i => i.state === "closed").length;
 
-  if (!loggedIn && !isDemo) return <LoginScreen onLogin={handleLogin} onDemo={handleDemo} />;
+  /* keyboard */
+  useEffect(() => {
+    const h = e => { if (e.key === "Escape") { setSelected(null); setShowNew(false); } };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, []);
+
+  if (!authed && !demo) return <Login onLogin={login} onDemo={enterDemo} />;
 
   return (
     <>
       <div className="header">
         <div className="header-left">
-          <span className="header-title">davidson00000/life</span>
-          {isDemo && <span className="label" style={{ background: "#e99695", color: "#000" }}>DEMO</span>}
+          <span className="header-title">Life Dashboard</span>
+          {demo && <Badge name="DEMO" />}
         </div>
         <div className="header-right">
-          {!isDemo && <button className="btn btn-primary" onClick={() => setShowNewIssue(true)}>+ New</button>}
-          <button className="btn" onClick={loadIssues}>↻ Sync</button>
-          <button className="btn" onClick={handleLogout}>Logout</button>
+          {!demo && <button className="btn btn-primary" onClick={() => setShowNew(true)}>+ New</button>}
+          <button className="btn" onClick={load} disabled={loading}>{loading ? "..." : "↻ Sync"}</button>
+          <button className="btn" onClick={logout}>Logout</button>
         </div>
       </div>
 
       <div className="stats">
-        OPEN: <span>{openCount}</span> | CLOSED: <span>{closedCount}</span> | TOTAL: <span>{openCount + closedCount}</span>
+        OPEN: <span>{openN}</span> &nbsp; CLOSED: <span>{closeN}</span> &nbsp; TOTAL: <span>{openN + closeN}</span>
       </div>
 
       <div className="filter-bar">
         <div className="filter-group">
           {["all","open","closed"].map(s => (
-            <button key={s} className={`btn btn-sm ${stateFilter===s?"btn-active":""}`}
-                    onClick={() => setStateFilter(s)}>
-              {s.toUpperCase()}
-            </button>
+            <button key={s} className={`btn btn-sm${stFilter===s?" btn-active":""}`} onClick={() => setStFilter(s)}>{s.toUpperCase()}</button>
           ))}
-          <span style={{ width: 8 }} />
-          <button className={`btn btn-sm ${labelFilter==="ALL"?"btn-active":""}`}
-                  onClick={() => setLabelFilter("ALL")}>ALL</button>
-          {LABEL_NAMES.map(l => (
-            <button key={l} className={`btn btn-sm ${labelFilter===l?"btn-active":""}`}
-                    onClick={() => setLabelFilter(l)}>
-              {l}
-            </button>
+          <div className="filter-sep" />
+          <button className={`btn btn-sm${lbFilter==="ALL"?" btn-active":""}`} onClick={() => setLbFilter("ALL")}>ALL</button>
+          {LABEL_NAMES.map(n => (
+            <button key={n} className={`btn btn-sm${lbFilter===n?" btn-active":""}`} onClick={() => setLbFilter(n)}>{n}</button>
           ))}
         </div>
         <div className="filter-group">
-          <button className={`btn btn-sm ${viewMode==="board"?"btn-active":""}`}
-                  onClick={() => setViewMode("board")}>Board</button>
-          <button className={`btn btn-sm ${viewMode==="list"?"btn-active":""}`}
-                  onClick={() => setViewMode("list")}>List</button>
-          <input className="search-input" placeholder="🔍 Search..." value={search}
-                 onChange={e => setSearch(e.target.value)} />
+          <button className={`btn btn-sm${view==="board"?" btn-active":""}`} onClick={() => setView("board")}>Board</button>
+          <button className={`btn btn-sm${view==="list"?" btn-active":""}`} onClick={() => setView("list")}>List</button>
+          <input className="search-input" placeholder="🔍 Search..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </div>
 
-      {error && <div style={{ padding: "12px 24px", color: "var(--red)" }}>Error: {error}</div>}
-
       {loading ? (
-        <div className="loading"><div className="spinner" /> 読み込み中...</div>
+        <div className="empty"><div className="spinner" /><span>読み込み中...</span></div>
       ) : filtered.length === 0 ? (
-        <div className="loading" style={{ color: "var(--text-muted)" }}>Issue が見つかりません</div>
-      ) : viewMode === "board" ? (
-        <BoardView issues={filtered} onClickIssue={setSelectedIssue} />
+        <div className="empty">Issue が見つかりません</div>
+      ) : view === "board" ? (
+        <Board issues={filtered} onSelect={setSelected} />
       ) : (
-        <ListView issues={filtered} onClickIssue={setSelectedIssue} />
+        <List issues={filtered} onSelect={setSelected} />
       )}
 
-      {selectedIssue && (
-        <DetailModal
-          issue={selectedIssue}
-          onClose={() => setSelectedIssue(null)}
-          onCloseIssue={handleCloseIssue}
-          onReopenIssue={handleReopenIssue}
-          isDemo={isDemo}
-        />
-      )}
-
-      {showNewIssue && (
-        <NewIssueModal
-          onClose={() => setShowNewIssue(false)}
-          onCreate={handleCreateIssue}
-        />
-      )}
+      {selected && <Detail issue={selected} onClose={() => setSelected(null)} onAction={patchState} isDemo={demo} />}
+      {showNew && <NewIssue onClose={() => setShowNew(false)} onCreate={create} />}
+      {toastEl}
     </>
   );
 }
