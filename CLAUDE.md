@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Life OS — a personal AI-augmented life management system ("Antigravity") that uses GitHub as a platform for automated daily news aggregation, AI-powered triage, idea management, and publishing workflows. The owner is a solo knowledge worker tracking AI research and startup news.
 
+`davidson00000/life` は人生のアクションアイテムを GitHub Issues で管理するリポジトリ。
+私（Kosuke）が「やること」「気になること」「アイデア」を投げたら、
+Claude Code がIssue として整理・登録・管理する。
+
 ## Key Rules
 
 - **Default language is Japanese.** All non-code output (descriptions, summaries, task content) must be in Japanese unless otherwise specified.
@@ -26,6 +30,76 @@ Life OS — a personal AI-augmented life management system ("Antigravity") that 
 | `PUBLICATIONS/` | Drafted YouTube scripts and X posts |
 | `PORTFOLIO/` | Finished works |
 | `TASKS/` | High-level projects and tasks |
+| `dashboard/` | Web ダッシュボード（GitHub Pages） |
+
+## Issue ラベル定義
+
+| ラベル | 対象 |
+|-------|------|
+| ACS | AI研究・ACSプロジェクト・Claude Code関連 |
+| work | 仕事・シェフラー・副業・キャリア |
+| life | 家族・生活・手続き・健康 |
+| learn | 学習・読書・技術習得 |
+| idea | アイデア・事業案・将来の検討事項 |
+| someday | 緊急ではないが忘れたくないもの |
+| urgent | 今週中に対応が必要なもの |
+| waiting | 誰かのアクション待ち |
+
+## Issue 登録のルール
+
+### いつ Issue を作るか
+- 複数のステップがある
+- 後で参照したい情報・経緯がある
+- 一度考える必要がある
+- **作らない**: 5分以内に終わる、買い物レベルのもの
+
+### Issue 作成の手順
+
+1. ユーザーの投げかけ内容を理解する
+2. 不足情報があれば **1つだけ** 質問する（複数一気に聞かない）
+3. 以下のフォーマットで Issue を作成する
+
+### Issue タイトルのルール
+- 動詞から始める: 「〇〇を△△する」
+- 具体的に: 「手続きをする」❌ → 「NISAの口座開設手続きをする」✅
+- 20文字以内を目安
+
+### 必ず聞くべき情報（不足の場合）
+- **期限**: いつまでにやるのか
+- **ラベル**: 上記のどのカテゴリか（自分で判断できる場合は不要）
+
+### 聞かなくてよい情報
+- 詳細な背景（後からコメントで追加できる）
+- 完璧なチェックリスト（まず登録することを優先）
+
+## ユーザーからの典型的な依頼パターン
+
+### パターン1: タスクの登録
+> 「確定申告の準備しないといけない」
+→ ラベル `life`、期限を確認して Issue 作成
+
+### パターン2: アイデアの記録
+> 「〇〇みたいなビジネス面白そうだと思った」
+→ ラベル `idea` で即 Issue 登録（詳細は後でOK）
+
+### パターン3: ACS 関連のタスク
+> 「Phase 7 の〇〇部分、設計しないといけない」
+→ ラベル `ACS` で登録。チェックリストを自分で考えて入れてよい
+
+### パターン4: 週次レビュー
+> 「今週のIssueを整理して」
+→ open な Issue を一覧して、期限切れ・優先度が高いものを報告
+
+### パターン5: Issue のクローズ
+> 「確定申告終わった」
+→ 該当 Issue を検索してクローズ。完了メモをコメントに残す
+
+## コミュニケーションのルール
+
+- 登録前に内容をサマリーして確認を取る（1行で）
+- 「〇〇という内容で Issue を作成しました（#番号）」と報告する
+- 迷ったらラベルは `idea` か `someday` にして後で整理
+- 長い説明より、まず登録することを優先する
 
 ## Commands
 
