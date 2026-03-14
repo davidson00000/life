@@ -144,3 +144,14 @@ To github.com:davidson00000/life.git
 翻訳エラー: HTTP Error 500: Internal Server Error
 日次ニュースを書き込みました: /Users/kousukenakamura/life/NEWS/2026-03-14.md
 GEMINI_API_KEY is not set. Skipping automated LLM triage.
+[main 36ff04a] chore: auto-update daily news & triage list for 2026-03-14
+ 3 files changed, 230 insertions(+), 64 deletions(-)
+ create mode 100644 NEWS/2026-03-14.md
+To github.com:davidson00000/life.git
+   aab1823..36ff04a  main -> main
+--- 実行完了: Sat Mar 14 05:31:45 JST 2026 ---
+--- 実行開始: Sun Mar 15 05:30:00 JST 2026 ---
+カテゴリ AI research のソース (URL: https://openai.com/blog/rss/) 取得でエラー: HTTP Error 404: Not Found
+カテゴリ AI research のソース (URL: https://rsshub.app/huggingface/daily-papers) 取得でエラー: HTTP Error 403: Forbidden
+日次ニュースを書き込みました: /Users/kousukenakamura/life/NEWS/2026-03-15.md
+GEMINI_API_KEY is not set. Skipping automated LLM triage.
