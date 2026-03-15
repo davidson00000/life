@@ -155,3 +155,14 @@ To github.com:davidson00000/life.git
 カテゴリ AI research のソース (URL: https://rsshub.app/huggingface/daily-papers) 取得でエラー: HTTP Error 403: Forbidden
 日次ニュースを書き込みました: /Users/kousukenakamura/life/NEWS/2026-03-15.md
 GEMINI_API_KEY is not set. Skipping automated LLM triage.
+[main 22abd86] chore: auto-update daily news & triage list for 2026-03-15
+ 3 files changed, 180 insertions(+), 15 deletions(-)
+ create mode 100644 NEWS/2026-03-15.md
+To github.com:davidson00000/life.git
+   36ff04a..22abd86  main -> main
+--- 実行完了: Sun Mar 15 05:31:47 JST 2026 ---
+--- 実行開始: Mon Mar 16 05:30:00 JST 2026 ---
+カテゴリ AI research のソース (URL: https://openai.com/blog/rss/) 取得でエラー: HTTP Error 404: Not Found
+カテゴリ AI research のソース (URL: https://rsshub.app/huggingface/daily-papers) 取得でエラー: HTTP Error 403: Forbidden
+日次ニュースを書き込みました: /Users/kousukenakamura/life/NEWS/2026-03-16.md
+GEMINI_API_KEY is not set. Skipping automated LLM triage.
