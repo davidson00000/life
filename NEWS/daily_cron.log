@@ -1433,3 +1433,37 @@ To github.com:davidson00000/life.git
 カテゴリ Startup/product のソース (URL: https://news.google.com/rss/search?q=%22%E4%B8%80%E4%BA%BA%E8%B5%B7%E6%A5%AD%22&hl=ja&gl=JP&ceid=JP:ja) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
 日次ニュースを書き込みました: /Users/kousukenakamura/life/NEWS/2026-04-27.md
 GEMINI_API_KEY is not set. Skipping automated LLM triage.
+[main c180b1c] chore: auto-update daily news & triage list for 2026-04-27
+ 2 files changed, 40 insertions(+)
+ create mode 100644 NEWS/2026-04-27.md
+To github.com:davidson00000/life.git
+   26532df..c180b1c  main -> main
+--- 実行完了: Mon Apr 27 05:30:16 JST 2026 ---
+--- 実行開始: Tue Apr 28 05:30:00 JST 2026 ---
+カテゴリ AI research のソース (URL: http://export.arxiv.org/rss/cs.AI) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: http://export.arxiv.org/rss/cs.LG) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: http://export.arxiv.org/rss/cs.CL) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: http://export.arxiv.org/rss/cs.CR) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://www.reddit.com/r/MachineLearning/.rss) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://www.reddit.com/r/LocalLLaMA/.rss) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://blog.google/technology/ai/rss/) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://openai.com/blog/rss/) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://huggingface.co/blog/feed.xml) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://rsshub.app/huggingface/daily-papers) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://deepmind.com/blog/feed/basic) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: http://bair.berkeley.edu/blog/feed.xml) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://zenn.dev/topics/llm/feed) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://news.google.com/rss/search?q=%22AI+agent%22+OR+%22LLM+agent%22&hl=en-US&gl=US&ceid=US:en) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ AI research のソース (URL: https://news.google.com/rss/search?q=%22AI%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88%22+OR+%22%E7%94%9F%E6%88%90AI%22+OR+%22LLM%22&hl=ja&gl=JP&ceid=JP:ja) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://www.reddit.com/r/startups/.rss) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://www.producthunt.com/feed) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://blog.ycombinator.com/feed/) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://techcrunch.com/feed/) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://hnrss.org/frontpage) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://news.ycombinator.com/rss) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://zenn.dev/feed) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://b.hatena.ne.jp/hotentry/it.rss) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://news.google.com/rss/search?q=solopreneur+OR+%22indie+hacker%22&hl=en-US&gl=US&ceid=US:en) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+カテゴリ Startup/product のソース (URL: https://news.google.com/rss/search?q=%22%E4%B8%80%E4%BA%BA%E8%B5%B7%E6%A5%AD%22&hl=ja&gl=JP&ceid=JP:ja) 取得でエラー: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>
+日次ニュースを書き込みました: /Users/kousukenakamura/life/NEWS/2026-04-28.md
+GEMINI_API_KEY is not set. Skipping automated LLM triage.
